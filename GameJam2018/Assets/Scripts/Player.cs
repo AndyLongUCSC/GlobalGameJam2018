@@ -21,33 +21,37 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetKey(KeyCode.W))
         {
             transform.rotation = forwardRotation;
             rigidbody.AddForce(Vector2.up * speed, ForceMode2D.Force);
         }
         transform.rotation = Quaternion.Lerp(transform.rotation, downRotation, tiltSmooth * Time.deltaTime);
-        /*
-        else if (Input.GetKey("KeyCode.S"))
-        {
+      
+        if (Input.GetKey(KeyCode.S))
+        { 
             rigidbody.AddForce(Vector2.up * (-1) * speed, ForceMode2D.Force);
-        }*/
-       /* else
+        }
+        else
         {
-            rigid
-            
-       body.AddForce(Vector2.up*0, ForceMode2D.Force);
-        }*/
+            rigidbody.AddForce(Vector2.up*0, ForceMode2D.Force);
+        }
     }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "ScoreZone")
         {
-
+            ;
         }
         if (collision.gameObject.tag == "DeadZone")
         {
             rigidbody.simulated = false;
+        }
+        if(collision.gameObject.tag == "Boundaries")
+        {
+            SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+            renderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
         }
     }
 }
