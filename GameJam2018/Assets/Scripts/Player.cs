@@ -5,8 +5,13 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
     // Use this for initialization
-    public Vector3 startPos;
+    //public Vector3 startPos;
     public float tiltSmooth = 5;
+    public float topSpeed = 10f;
+    public float drag = 0f;
+    public float acceleration = 10f;
+    private Vector3 velocity;
+    public float currentSpeed;
     Rigidbody2D rigidbody;
 
     public float speed = 10;
@@ -24,17 +29,33 @@ public class Player : MonoBehaviour {
         if (Input.GetKey(KeyCode.W))
         {
             transform.rotation = forwardRotation;
-            rigidbody.AddForce(Vector2.up * speed, ForceMode2D.Force);
+            drag = (acceleration / topSpeed);
+            rigidbody.velocity += (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
+            currentSpeed = rigidbody.velocity.magnitude;
         }
-        transform.rotation = Quaternion.Lerp(transform.rotation, downRotation, tiltSmooth * Time.deltaTime);
+       
       
         if (Input.GetKey(KeyCode.S))
-        { 
-            rigidbody.AddForce(Vector2.up * (-1) * speed, ForceMode2D.Force);
+        {
+            drag = (acceleration / topSpeed);
+            rigidbody.velocity += (-1)*(Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
+            currentSpeed = rigidbody.velocity.magnitude;
+            transform.rotation = Quaternion.Lerp(transform.rotation, downRotation, tiltSmooth * Time.deltaTime);
         }
         else
         {
             rigidbody.AddForce(Vector2.up*0, ForceMode2D.Force);
+        }
+        // Y axis
+        if (transform.position.y <= -4.6f)
+        {
+            transform.position = new Vector2(transform.position.x, -4.6f);
+            currentSpeed = 0;
+        }
+        else if (transform.position.y >= 4.16f)
+        {
+            transform.position = new Vector2(transform.position.x, 4.16f);
+            currentSpeed = 0;
         }
     }
 
