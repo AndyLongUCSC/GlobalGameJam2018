@@ -26,7 +26,7 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W) && transform.position.y <= 4.1)
         {
             transform.rotation = forwardRotation;
             drag = (acceleration / topSpeed);
@@ -35,7 +35,7 @@ public class Player : MonoBehaviour {
         }
        
       
-        if (Input.GetKey(KeyCode.S))
+        else if (Input.GetKey(KeyCode.S)&& transform.position.y >= -4.45)
         {
             drag = (acceleration / topSpeed);
             rigidbody.velocity += (-1)*(Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
@@ -44,18 +44,21 @@ public class Player : MonoBehaviour {
         }
         else
         {
-            rigidbody.AddForce(Vector2.up*0, ForceMode2D.Force);
+            rigidbody.velocity = (0) * (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime; ;
+            currentSpeed = rigidbody.velocity.magnitude;
         }
         // Y axis
-        if (transform.position.y <= -4.6f)
+        if (transform.position.y <= -4.5f)
         {
-            transform.position = new Vector2(transform.position.x, -4.6f);
-            currentSpeed = 0;
+            transform.position = new Vector2(transform.position.x, -4.5f);
+            currentSpeed = -10;
+            acceleration = 10;
         }
         else if (transform.position.y >= 4.16f)
         {
             transform.position = new Vector2(transform.position.x, 4.16f);
-            currentSpeed = 0;
+            currentSpeed = -10;
+            acceleration = 10;
         }
     }
 
