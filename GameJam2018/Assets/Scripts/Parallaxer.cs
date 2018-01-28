@@ -129,7 +129,7 @@ public class Parallaxer : MonoBehaviour
         //discarding them as they go off screen
         for (int i = 0; i < poolObjects.Length; i++)
         {
-            poolObjects[i].transform.position += Vector3.right * shiftSpeed * Time.deltaTime;
+            poolObjects[i].transform.position += Vector3.left * shiftSpeed * Time.deltaTime;
             CheckDisposeObject(poolObjects[i]);
         }
     }
