@@ -1,12 +1,21 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
     // Use this for initialization
-    public Vector3 startPos;
+    public Vector2 startPos;
+    public delegate void PlayerDelegate();
+    public static event PlayerDelegate OnPlayerGameOver;
+    public static event PlayerDelegate OnPlayerCollision;
     public float tiltSmooth = 5;
+    public float topSpeed = 10f;
+    public float drag = 0f;
+    public float acceleration = 5f;
+    public float letterHealth = 100;
+    private Vector3 velocity;
+    public float currentSpeed;
     Rigidbody2D rigidbody;
 
     public float speed = 10;
@@ -15,19 +24,34 @@ public class Player : MonoBehaviour {
     Quaternion forwardRotation;
     void Start () {
         rigidbody = GetComponent<Rigidbody2D>();
-        downRotation = Quaternion.Euler(0, 0, -90);
-        forwardRotation = Quaternion.Euler(0, 0, 35);
+        downRotation = Quaternion.Euler(0, 0, -60);
+        forwardRotation = Quaternion.Euler(0, 0, 25);
 	}
+
+    void OnGameStarted()
+    {
+        rigidbody.velocity = Vector2.zero;
+        rigidbody.simulated = true;
+
+    }
+
+    void OnGameOverConfirmed()
+    {
+        transform.localPosition = startPos;
+        transform.rotation = Quaternion.identity;
+    }
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKey(KeyCode.W) && transform.position.y <= 4.1)
+        // Y Axis
+        if (Input.GetKey(KeyCode.W))
         {
             transform.rotation = forwardRotation;
-            rigidbody.AddForce(Vector2.up * speed, ForceMode2D.Force);
+            drag = (acceleration / topSpeed);
+            rigidbody.velocity += (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
+            currentSpeed = rigidbody.velocity.magnitude;
         }
-      
-        else if (Input.GetKey(KeyCode.S)&& transform.position.y >= -4.45)
+        else if (Input.GetKey(KeyCode.S))
         {
             drag = (acceleration / topSpeed);
             rigidbody.velocity += (-1)*(Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
@@ -36,35 +60,50 @@ public class Player : MonoBehaviour {
         }
         else
         {
-            rigidbody.velocity = (0) * (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime; ;
+            rigidbody.velocity += (0) * (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
             currentSpeed = rigidbody.velocity.magnitude;
         }
 
-        // Y axis
         if (transform.position.y <= -4.5f)
         {
             transform.position = new Vector2(transform.position.x, -4.5f);
-            currentSpeed = -10;
-            acceleration = 10;
         }
-        else if (transform.position.y >= 4.16f)
+        else if (transform.position.y >= 4.5f)
         {
-            transform.position = new Vector2(transform.position.x, 4.16f);
-            currentSpeed = -10;
-            acceleration = 10;
+            transform.position = new Vector2(transform.position.x, 4.5f);
         }
 
+        // X Axis
+        if (Input.GetKey(KeyCode.A))
+        {
+            rigidbody.velocity += (Vector2.left * acceleration * Time.fixedDeltaTime);
+            currentSpeed = rigidbody.velocity.magnitude;
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            rigidbody.velocity += (-1)*(Vector2.left * acceleration * Time.fixedDeltaTime);
+            currentSpeed = rigidbody.velocity.magnitude;
+        } else
+        {
+            rigidbody.velocity += (0) * (Vector2.left * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
+            currentSpeed = rigidbody.velocity.magnitude;
+        }
+
+        if (transform.position.x <= -8f)
+        {
+            transform.position = new Vector2(-8f, transform.position.y);
+        }
+        else if (transform.position.x >= 8f)
+        {
+            transform.position = new Vector2(8f, transform.position.y);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "ScoreZone")
-        {
-            ;
-        }
-        if (collision.gameObject.tag == "DeadZone")
-        {
-            rigidbody.simulated = false;
+        if (collision.gameObject.tag == "CollisionZone")
+        { // indicates where the pidgeon collides with stuff
+            letterHealth -= 5;
         }
         if(collision.gameObject.tag == "Boundaries")
         {
