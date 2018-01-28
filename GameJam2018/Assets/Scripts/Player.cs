@@ -5,13 +5,8 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
     // Use this for initialization
-    //public Vector3 startPos;
+    public Vector3 startPos;
     public float tiltSmooth = 5;
-    public float topSpeed = 10f;
-    public float drag = 0f;
-    public float acceleration = 10f;
-    private Vector3 velocity;
-    public float currentSpeed;
     Rigidbody2D rigidbody;
 
     public float speed = 10;
@@ -29,11 +24,8 @@ public class Player : MonoBehaviour {
         if (Input.GetKey(KeyCode.W) && transform.position.y <= 4.1)
         {
             transform.rotation = forwardRotation;
-            drag = (acceleration / topSpeed);
-            rigidbody.velocity += (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
-            currentSpeed = rigidbody.velocity.magnitude;
+            rigidbody.AddForce(Vector2.up * speed, ForceMode2D.Force);
         }
-       
       
         else if (Input.GetKey(KeyCode.S)&& transform.position.y >= -4.45)
         {
@@ -47,6 +39,7 @@ public class Player : MonoBehaviour {
             rigidbody.velocity = (0) * (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime; ;
             currentSpeed = rigidbody.velocity.magnitude;
         }
+
         // Y axis
         if (transform.position.y <= -4.5f)
         {
@@ -60,6 +53,7 @@ public class Player : MonoBehaviour {
             currentSpeed = -10;
             acceleration = 10;
         }
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
