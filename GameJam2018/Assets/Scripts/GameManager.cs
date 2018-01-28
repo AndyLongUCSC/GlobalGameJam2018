@@ -1,10 +1,9 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
-{
+public class GameManager : MonoBehaviour {
 
     public static GameManager Instance;
 
@@ -18,8 +17,7 @@ public class GameManager : MonoBehaviour
     public GameObject letterPage;
     public GameObject dialoguePage;
 
-    enum PageState
-    {
+    enum PageState {
         None,
         Start,
         Dialogue,
@@ -30,13 +28,32 @@ public class GameManager : MonoBehaviour
 
     bool gameOver = false;
     public bool GameOver { get { return gameOver; } }
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     private void OnEnable()
     {
+        Player.OnPlayerGameOver += OnPlayerGameOver;
+        Player.OnPlayerCollision += OnPlayerCollision;
 
     }
 
     private void OnDisable()
+    {
+        Player.OnPlayerGameOver -= OnPlayerGameOver;
+        Player.OnPlayerCollision -= OnPlayerCollision;
+
+    }
+
+    void OnPlayerGameOver()
+    {
+        gameOver = true;
+        SetPageState(PageState.GameOver);
+    }
+
+    void OnPlayerCollision()
     {
 
     }
@@ -99,7 +116,7 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        SetPageState(PageState.Start);
         SetPageState(PageState.Dialogue);
     }
 }
-
