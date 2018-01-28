@@ -21,21 +21,39 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        if (Input.GetKey(KeyCode.W))
+        if (Input.GetKey(KeyCode.W) && transform.position.y <= 4.1)
         {
             transform.rotation = forwardRotation;
             rigidbody.AddForce(Vector2.up * speed, ForceMode2D.Force);
         }
-        transform.rotation = Quaternion.Lerp(transform.rotation, downRotation, tiltSmooth * Time.deltaTime);
       
-        if (Input.GetKey(KeyCode.S))
-        { 
-            rigidbody.AddForce(Vector2.up * (-1) * speed, ForceMode2D.Force);
+        else if (Input.GetKey(KeyCode.S)&& transform.position.y >= -4.45)
+        {
+            drag = (acceleration / topSpeed);
+            rigidbody.velocity += (-1)*(Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime;
+            currentSpeed = rigidbody.velocity.magnitude;
+            transform.rotation = Quaternion.Lerp(transform.rotation, downRotation, tiltSmooth * Time.deltaTime);
         }
         else
         {
-            rigidbody.AddForce(Vector2.up*0, ForceMode2D.Force);
+            rigidbody.velocity = (0) * (Vector2.up * acceleration - (drag * rigidbody.velocity)) * Time.fixedDeltaTime; ;
+            currentSpeed = rigidbody.velocity.magnitude;
         }
+
+        // Y axis
+        if (transform.position.y <= -4.5f)
+        {
+            transform.position = new Vector2(transform.position.x, -4.5f);
+            currentSpeed = -10;
+            acceleration = 10;
+        }
+        else if (transform.position.y >= 4.16f)
+        {
+            transform.position = new Vector2(transform.position.x, 4.16f);
+            currentSpeed = -10;
+            acceleration = 10;
+        }
+
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
