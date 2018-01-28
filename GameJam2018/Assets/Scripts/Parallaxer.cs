@@ -22,6 +22,7 @@ public class Parallaxer : MonoBehaviour
     }
 
     public GameObject Prefab;
+    public int LevelSpawn;
     public int poolSize;
     public float shiftSpeed;
     public float spawnRate;
@@ -36,7 +37,6 @@ public class Parallaxer : MonoBehaviour
     PoolObject[] poolObjects;
     float targetAspect;
     GameManager game;
-
     void Awake()
     {
         Configure();
@@ -102,24 +102,30 @@ public class Parallaxer : MonoBehaviour
 
     void Spawn()
     {
-        //moving pool objects into place
-        Transform t = GetPoolObject();
-        if (t == null) return;
-        Vector3 pos = Vector3.zero;
-        pos.y = Random.Range(ySpawnRange.minY, ySpawnRange.maxY);
-        pos.x = (defaultSpawnPos.x * Camera.main.aspect) / targetAspect;
-        t.position = pos;
+        if (LevelSpawn == GameManager.level)
+        {
+            //moving pool objects into place
+            Transform t = GetPoolObject();
+            if (t == null) return;
+            Vector3 pos = Vector3.zero;
+            pos.y = Random.Range(ySpawnRange.minY, ySpawnRange.maxY);
+            pos.x = (defaultSpawnPos.x * Camera.main.aspect) / targetAspect;
+            t.position = pos;
+        }
     }
 
     void SpawnImmediate()
     {
-        Transform t = GetPoolObject();
-        if (t == null) return;
-        Vector3 pos = Vector3.zero;
-        pos.y = Random.Range(ySpawnRange.minY, ySpawnRange.maxY);
-        pos.x = (immediateSpawnPos.x * Camera.main.aspect) / targetAspect;
-        t.position = pos;
-        Spawn();
+        if (LevelSpawn == GameManager.level)
+        {
+            Transform t = GetPoolObject();
+            if (t == null) return;
+            Vector3 pos = Vector3.zero;
+            pos.y = Random.Range(ySpawnRange.minY, ySpawnRange.maxY);
+            pos.x = (immediateSpawnPos.x * Camera.main.aspect) / targetAspect;
+            t.position = pos;
+            Spawn();
+        }
     }
 
     void Shift()

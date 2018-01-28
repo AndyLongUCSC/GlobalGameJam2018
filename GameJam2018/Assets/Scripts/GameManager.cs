@@ -10,14 +10,18 @@ public class GameManager : MonoBehaviour {
     public delegate void GameDelegate();
     public static event GameDelegate OnGameStarted;
     public static event GameDelegate OnGameOverConfirmed;
-
+    public static event GameDelegate OnWinConfirmed;
     public GameObject startPage;
+    public GameObject playPage;
     public GameObject endPage;
     public GameObject gameOverPage;
     public GameObject letterPage;
     public GameObject dialoguePage;
     public GameObject winPage;
+    public GameObject playerObject;
     public Text TimeText;
+
+    public static int level = 0; //level 1 = area 1, 2 = area 2, 3 = area 3, 4 = credits, 0 = title
 
     public float scrollSpeed = -5f;
 
@@ -25,6 +29,7 @@ public class GameManager : MonoBehaviour {
         None,
         Start,
         Dialogue,
+        Play,
         End,
         GameOver,
         Letter,
@@ -42,6 +47,7 @@ public class GameManager : MonoBehaviour {
     {
         Player.OnPlayerGameOver += OnPlayerGameOver;
         Player.OnPlayerCollision += OnPlayerCollision;
+        Player.OnPlayerWin += OnPlayerWin;
 
     }
 
@@ -49,6 +55,7 @@ public class GameManager : MonoBehaviour {
     {
         Player.OnPlayerGameOver -= OnPlayerGameOver;
         Player.OnPlayerCollision -= OnPlayerCollision;
+        Player.OnPlayerWin -= OnPlayerWin;
 
     }
 
@@ -63,12 +70,18 @@ public class GameManager : MonoBehaviour {
 
     }
 
+    void OnPlayerWin()
+    {
+        level++;
+    }
+
     void SetPageState(PageState state)
     {
         switch (state)
         {
             case PageState.None:
                 startPage.SetActive(false);
+                playPage.SetActive(false);
                 endPage.SetActive(false);
                 gameOverPage.SetActive(false);
                 dialoguePage.SetActive(false);
@@ -77,6 +90,16 @@ public class GameManager : MonoBehaviour {
                 break;
             case PageState.Start:
                 startPage.SetActive(true);
+                playPage.SetActive(false);
+                endPage.SetActive(false);
+                gameOverPage.SetActive(false);
+                dialoguePage.SetActive(false);
+                letterPage.SetActive(false);
+                winPage.SetActive(false);
+                break;
+            case PageState.Play:
+                startPage.SetActive(false);
+                playPage.SetActive(true);
                 endPage.SetActive(false);
                 gameOverPage.SetActive(false);
                 dialoguePage.SetActive(false);
@@ -85,6 +108,7 @@ public class GameManager : MonoBehaviour {
                 break;
             case PageState.End:
                 startPage.SetActive(false);
+                playPage.SetActive(false);
                 endPage.SetActive(true);
                 gameOverPage.SetActive(false);
                 dialoguePage.SetActive(false);
@@ -93,6 +117,7 @@ public class GameManager : MonoBehaviour {
                 break;
             case PageState.GameOver:
                 startPage.SetActive(false);
+                playPage.SetActive(false);
                 endPage.SetActive(false);
                 gameOverPage.SetActive(true);
                 dialoguePage.SetActive(false);
@@ -101,6 +126,7 @@ public class GameManager : MonoBehaviour {
                 break;
             case PageState.Dialogue:
                 startPage.SetActive(false);
+                playPage.SetActive(false);
                 endPage.SetActive(false);
                 gameOverPage.SetActive(false);
                 dialoguePage.SetActive(true);
@@ -109,6 +135,7 @@ public class GameManager : MonoBehaviour {
                 break;
             case PageState.Letter:
                 startPage.SetActive(false);
+                playPage.SetActive(false);
                 endPage.SetActive(false);
                 gameOverPage.SetActive(false);
                 dialoguePage.SetActive(false);
@@ -117,6 +144,7 @@ public class GameManager : MonoBehaviour {
                 break;
             case PageState.Win:
                 startPage.SetActive(false);
+                playPage.SetActive(false);
                 endPage.SetActive(false);
                 gameOverPage.SetActive(false);
                 dialoguePage.SetActive(false);
@@ -130,13 +158,25 @@ public class GameManager : MonoBehaviour {
     {
         //activate when losing a level
         OnGameOverConfirmed();
-        SetPageState(PageState.Start);
+        SetPageState(PageState.Play);
     }
 
     public void StartGame()
     {
         //activate on play button
         SetPageState(PageState.Start);
-        SetPageState(PageState.Dialogue);
+        if (Input.GetKey("enter"))
+        {
+            SetPageState(PageState.Dialogue);
+        }
+    }
+
+    public void ConfirmWin()
+    {
+        OnWinConfirmed();
+        //activate when player wins game
+        SetPageState(PageState.Win);
+        SetPageState(PageState.Letter);
+        SetPageState(PageState.Start);
     }
 }
