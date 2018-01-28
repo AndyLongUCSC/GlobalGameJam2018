@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +8,7 @@ public class Player : MonoBehaviour {
     public Vector2 startPos;
     public delegate void PlayerDelegate();
     public static event PlayerDelegate OnPlayerGameOver;
+    public static event PlayerDelegate OnPlayerWin;
     public static event PlayerDelegate OnPlayerCollision;
     public float tiltSmooth = 5;
     public float topSpeed = 10f;
@@ -39,6 +40,11 @@ public class Player : MonoBehaviour {
     {
         transform.localPosition = startPos;
         transform.rotation = Quaternion.identity;
+    }
+
+    void OnWinConfirmed()
+    {
+
     }
 	
 	// Update is called once per frame
