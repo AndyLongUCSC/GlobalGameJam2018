@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class Player : MonoBehaviour {
@@ -8,6 +9,7 @@ public class Player : MonoBehaviour {
     public Vector2 startPos;
     public delegate void PlayerDelegate();
     public static event PlayerDelegate OnPlayerGameOver;
+    public static event PlayerDelegate OnPlayerWin;
     public static event PlayerDelegate OnPlayerCollision;
     public float tiltSmooth = 5;
     public float topSpeed = 10f;
@@ -16,7 +18,17 @@ public class Player : MonoBehaviour {
     public float letterHealth = 100;
     private Vector3 velocity;
     public float currentSpeed;
+    public bool invincible = false;
+    public int count = 4;
     Rigidbody2D rigidbody;
+
+    public Sprite my1Image; //Drag your first sprite here in inspector.
+    public Sprite my2Image; //Drag your second sprite here in inspector.
+    public Sprite my3Image;
+    public Sprite my4Image;
+
+    public Sprite my1Image2;
+    public Sprite my1Image3;
 
     public float speed = 10;
 
@@ -24,9 +36,15 @@ public class Player : MonoBehaviour {
     Quaternion forwardRotation;
     void Start () {
         rigidbody = GetComponent<Rigidbody2D>();
-        downRotation = Quaternion.Euler(0, 0, -60);
-        forwardRotation = Quaternion.Euler(0, 0, 25);
-	}
+        /*downRotation = Quaternion.Euler(0, 0, -60);
+        forwardRotation = Quaternion.Euler(0, 0, 25);*/
+        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+        renderer.sprite = my1Image;
+        if (GameManager.level == 1)
+        {
+            renderer.sprite = my1Image;
+        }
+    }
 
     void OnGameStarted()
     {
@@ -39,6 +57,11 @@ public class Player : MonoBehaviour {
     {
         transform.localPosition = startPos;
         transform.rotation = Quaternion.identity;
+    }
+
+    void OnWinConfirmed()
+    {
+
     }
 	
 	// Update is called once per frame
@@ -97,18 +120,71 @@ public class Player : MonoBehaviour {
         {
             transform.position = new Vector2(8f, transform.position.y);
         }
+        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+        if (GameManager.level == 2)
+        {
+            renderer.sprite = my1Image2;
+        }
+        else if (GameManager.level == 3)
+        {
+            renderer.sprite = my1Image3;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (collision.gameObject.tag == "CollisionZone")
-        { // indicates where the pidgeon collides with stuff
-            letterHealth -= 5;
+        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+        if (!invincible)
+        {
+            if (collision.gameObject.tag == "Enemies")
+            { // indicates where the pidgeon collides with stuff
+               
+                OnPlayerCollision(); //event sent to healthbar1
+                invincible = true;
+                count--;
+                if (count != 0)
+                {
+                    if(GameManager.level == 1)
+                    {
+                        if (count == 3) {
+                            renderer.sprite = my2Image;
+                        }
+                        if (count == 2)
+                        {
+                            renderer.sprite = my3Image;
+                        }
+                        if (count == 1)
+                        {
+                            renderer.sprite = my4Image;
+                        }
+                    }               
+                    renderer.color = new Color(0.121f, 1f, 0.039f, 1.0f);
+                    Invoke("resetInvul", 2);
+                }
+                else
+                {
+                    OnPlayerGameOver();//event sent to gamemanager
+                }
+            }
+        }
+        if(collision.gameObject.tag == "Finish")
+        {
+            OnPlayerWin(); //event sent to gamemanager
+            count = 4;
+            if(GameManager.level == 3)
+            {
+                transform.localScale += new Vector3(0.2F, 0.2F, 0);
+            }
         }
         if(collision.gameObject.tag == "Boundaries")
         {
-            SpriteRenderer renderer = GetComponent<SpriteRenderer>();
             renderer.color = new Color(0.5f, 0.5f, 0.5f, 1f);
         }
+    }
+    void resetInvul()
+    {
+        SpriteRenderer renderer = GetComponent<SpriteRenderer>();
+        invincible = false;
+        renderer.color = new Color(1f, 1f, 1f, 1f);
     }
 }

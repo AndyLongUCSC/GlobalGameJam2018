@@ -541,10 +541,10 @@ MonoBehaviour:
   shiftSpeed: 20
   spawnRate: 14
   ySpawnRange:
-    minY: -4.4
-    maxY: -3.5
+    minY: 3.5
+    maxY: 4.4
   defaultSpawnPos: {x: 10, y: 0, z: 0}
-  spawnImmediate: 0
+  spawnImmediate: 1
   immediateSpawnPos: {x: 0, y: 0, z: 0}
   targetAspectRatio: {x: 16, y: 9}
 --- !u!1 &590893186
